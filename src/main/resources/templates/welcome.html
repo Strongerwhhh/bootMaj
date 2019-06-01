@@ -158,150 +158,145 @@
         </div>
     </div>
 </div>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $(function() {
+            var flag1 = false;
+            var flag2 = false;
+            var flag3 = false;
+            var logup_account_check="";
+            function check(input){
+                var reg=/^[\w]{6,12}$/;
+                return reg.test(input);
+            }
 
-        <div id="myAlert" class="alert alert-danger text-center" >
-            <strong>${errorMsg}！</strong>
-            <a href="#" id="myclose" data-dismiss="alert">&times;</a>
-        </div>
+            $("#logup_account")
+                .blur(
+                    function() {
+                        var logup_account = $("#logup_account").val();
+                        console.log("check:"+check(logup_account));
+                        //检查账号是否为空
+                        if (logup_account === "") {
+                            $("#judge_img1").html("<div id='judge_img1'></div>");
+                            $("#logup_account_message1").html("<span id='logup_account_message1'></span>");
+                            return false;
+                        }
+                        //检查账号是否重复
+                        else if(logup_account === logup_account_check){
+                            return false;
+                        }
+                        //检查账号格式
+                        else if(!check(logup_account)){
+                            logup_account_check=logup_account;
+                            $("#judge_img1").html("<div style='position: absolute;top:40px;left:550px' id='judge_img1'><img src='/static/img/core-img/2.jpg' style='height: 30px;width: 30px'/></div>");
+                            $("#logup_account_message1").html("<span id='logup_account_message1' style='color: red;'>用户名格式错误</span>");
+                        }
+                        else {
+                            logup_account_check=logup_account;
+                            $.post("/log/checkAccount",{logup_account : logup_account},function (flag) {
+                                if(!flag){
+                                    $("#judge_img1").html("<div style='position: absolute;top:40px;left:550px' id='judge_img1'><img id='i1' src='/static/img/core-img/1.jpg' style='height: 30px;width: 30px'/></div>");
+                                    $("#logup_account_message1").html("<span id='logup_account_message1' style='color: green;'>该用户可用</span>");
+                                    flag1 = true;
+                                }else{
+                                    $("#judge_img1").html("<div style='position: absolute;top:40px;left:550px' id='judge_img1'><img src='/static/img/core-img/2.jpg' style='height: 30px;width: 30px'/></div>");
+                                    $("#logup_account_message1").html("<span id='logup_account_message1' style='color: red;'>用户名重复</span>");
+                                }
+                            })
+                        }
+                    });
+
+            $("#logup_password")
+                .blur(
+                    function() {
+                        var logup_password = $("#logup_password").val();
+                        flag3 = false;
+                        $("#logup_password1").val("");
+                        $("#judge_img3").html("<div id='judge_img3'></div>");
+                        $("#logup_password_message3").html("<span id='logup_password_message3'></span>");
+                        if (logup_password === "") {
+                            $("#judge_img2").html("<div id='judge_img2'></div>");
+                            $("#logup_password_message2").html("<span id='logup_password_message2'></span>");
+                        } else {
+                            console.log("pwd check:"+check(logup_password))
+                            if (check(logup_password)) {
+                                $("#judge_img2").html("<div style='position: absolute;margin-top:-30px;left:550px' id='judge_img2'><img src='/static/img/core-img/1.jpg' style='height: 30px;width: 30px'/></div>")
+                                $("#logup_password_message2").html("<span id='logup_password_message2' style='color: green;'>该密码可用</span>")
+                                flag2 = true;
+                            } else {
+                                $("#judge_img2").html("<div style='position: absolute;margin-top:-30px;left:550px'  id='judge_img2'><img src='/static/img/core-img/2.jpg' style='height: 30px;width: 30px'/></div>")
+                                $("#logup_password_message2").html("<span id='logup_password_message2' style='color: red;'>密码格式错误</span>")
+                            }
+                        }
+                    });
+
+            $("#logup_password1")
+                .blur(
+                    function() {
+                        var logup_password1 = $("#logup_password1").val();
+                        var logup_password = $("#logup_password").val();
+                        if (logup_password1 === "" || logup_password === "") {
+                            $("#judge_img3").html("<div id='judge_img3'></div>")
+                            $("#logup_password_message3").html("<span id='logup_password_message3'></span>")
+                        } else {
+                            if (logup_password1 === logup_password) {
+                                $("#judge_img3").html("<div style='position: absolute;margin-top:-45px;left:550px' id='judge_img3'><img src='/static/img/core-img/1.jpg' style='height: 30px;width: 30px'/></div>")
+                                $("#logup_password_message3").html("<span id='logup_password_message3'></span>")
+                                flag3 = true;
+                            } else {
+                                $("#judge_img3").html("<div style='position: absolute;margin-top:-45px;left:550px' id='judge_img3'><img src='/static/img/core-img/2.jpg' style='height: 30px;width: 30px'/></div>")
+                                $("#logup_password_message3").html("<span id='logup_password_message3' style='color: red;'>两次密码不一致</span>")
+                            }
+                        }
+                    });
+
+            $("#logup_submit").click(function() {
+                if (flag1 && flag2 && flag3) {
+                } else {
+                    var msg={
+                        title : "错误",
+                        text : "请检查所有内容是否正确",
+                        type : "error"
+                    }
+                    setMsg(msg)
+                    return false;
+                }
+            });
+
+            $("#login_submit").click(function() {
+                var account = $("#login_account").val();
+                var password = $("#login_password").val();
+                console.log("account check:"+check(account))
+                console.log("password check："+check(password))
+                if(!check(account) || !check(password)){
+                    var msg={
+                        title : "错误",
+                        text : "账号密码格式不对",
+                        type : "error"
+                    }
+                    setMsg(msg)
+                    return false;
+                }
+            });
+        });
+        $(function() {
+            $("#slider3").responsiveSlides({
+                auto: true,
+                pager: false,
+                nav: true,
+                speed: 500,
+                namespace: "callbacks",
+                before: function() {
+                    $('.events').append("<li>before event fired.</li>");
+                },
+                after: function() {
+                    $('.events').append("<li>after event fired.</li>");
+                }
+            });
+
+        });
+        /*]]>*/
+    </script>
 </body>
 
-<script type="text/javascript">
-    var flag1 = false;
-    var flag2 = false;
-    var flag3 = false;
-    var logup_account_check="";
-    $(function() {
-
-        function check(input){
-            var reg=/^[\w]{6,12}$/;
-            return reg.test(input);
-        }
-
-
-        $("#logup_account")
-            .blur(
-                function() {
-                    var logup_account = $("#logup_account").val();
-                    console.log("check:"+check(logup_account));
-                    //检查账号是否为空
-                    if (logup_account === "") {
-                        $("#judge_img1").html("<div id='judge_img1'></div>");
-                        $("#logup_account_message1").html("<span id='logup_account_message1'></span>");
-                        return false;
-                    }
-                    //检查账号是否重复
-                    else if(logup_account === logup_account_check){
-                        return false;
-                    }
-                    //检查账号格式
-                    else if(!check(logup_account)){
-                        logup_account_check=logup_account;
-                        $("#judge_img1").html("<div style='position: absolute;top:40px;left:550px' id='judge_img1'><img src='/static/img/core-img/2.jpg' style='height: 30px;width: 30px'/></div>");
-                        $("#logup_account_message1").html("<span id='logup_account_message1' style='color: red;'>用户名格式错误</span>");
-                    }
-                    else {
-                        logup_account_check=logup_account;
-                        $.post("/log/checkAccount",{logup_account : logup_account},function (flag) {
-                            if(!flag){
-                                $("#judge_img1").html("<div style='position: absolute;top:40px;left:550px' id='judge_img1'><img id='i1' src='/static/img/core-img/1.jpg' style='height: 30px;width: 30px'/></div>");
-                                $("#logup_account_message1").html("<span id='logup_account_message1' style='color: green;'>该用户可用</span>");
-                                flag1 = true;
-                            }else{
-                                $("#judge_img1").html("<div style='position: absolute;top:40px;left:550px' id='judge_img1'><img src='/static/img/core-img/2.jpg' style='height: 30px;width: 30px'/></div>");
-                                $("#logup_account_message1").html("<span id='logup_account_message1' style='color: red;'>用户名重复</span>");
-                            }
-                        })
-                    }
-                });
-
-        $("#logup_password")
-            .blur(
-                function() {
-                    var logup_password = $("#logup_password").val();
-                    flag3 = false;
-                    $("#logup_password1").val("");
-                    $("#judge_img3").html("<div id='judge_img3'></div>");
-                    $("#logup_password_message3").html("<span id='logup_password_message3'></span>");
-                    if (logup_password === "") {
-                        $("#judge_img2").html("<div id='judge_img2'></div>");
-                        $("#logup_password_message2").html("<span id='logup_password_message2'></span>");
-                    } else {
-                        console.log("pwd check:"+check(logup_password))
-                        if (check(logup_password)) {
-                            $("#judge_img2").html("<div style='position: absolute;margin-top:-30px;left:550px' id='judge_img2'><img src='/static/img/core-img/1.jpg' style='height: 30px;width: 30px'/></div>")
-                            $("#logup_password_message2").html("<span id='logup_password_message2' style='color: green;'>该密码可用</span>")
-                            flag2 = true;
-                        } else {
-                            $("#judge_img2").html("<div style='position: absolute;margin-top:-30px;left:550px'  id='judge_img2'><img src='/static/img/core-img/2.jpg' style='height: 30px;width: 30px'/></div>")
-                            $("#logup_password_message2").html("<span id='logup_password_message2' style='color: red;'>密码格式错误</span>")
-                        }
-                    }
-                });
-
-        $("#logup_password1")
-            .blur(
-                function() {
-                    var logup_password1 = $("#logup_password1").val();
-                    var logup_password = $("#logup_password").val();
-                    if (logup_password1 === "" || logup_password === "") {
-                        $("#judge_img3").html("<div id='judge_img3'></div>")
-                        $("#logup_password_message3").html("<span id='logup_password_message3'></span>")
-                    } else {
-                        if (logup_password1 === logup_password) {
-                            $("#judge_img3").html("<div style='position: absolute;margin-top:-45px;left:550px' id='judge_img3'><img src='/static/img/core-img/1.jpg' style='height: 30px;width: 30px'/></div>")
-                            $("#logup_password_message3").html("<span id='logup_password_message3'></span>")
-                            flag3 = true;
-                        } else {
-                            $("#judge_img3").html("<div style='position: absolute;margin-top:-45px;left:550px' id='judge_img3'><img src='/static/img/core-img/2.jpg' style='height: 30px;width: 30px'/></div>")
-                            $("#logup_password_message3").html("<span id='logup_password_message3' style='color: red;'>两次密码不一致</span>")
-                        }
-                    }
-                });
-
-        $("#logup_submit").click(function() {
-            if (flag1 & flag2 & flag3) {
-            } else {
-                var msg={
-                    title : "错误",
-                    text : "请检查所有内容是否正确",
-                    type : "error"
-                }
-                setMsg(msg)
-                return false;
-            }
-        });
-
-        $("#login_submit").click(function() {
-            var account = $("#login_account").val();
-            var password = $("#login_password").val();
-            console.log("account check:"+check(account))
-            console.log("password check："+check(password))
-            if(!check(account) || !check(password)){
-                var msg={
-                    title : "错误",
-                    text : "账号密码格式不对",
-                    type : "error"
-                }
-                setMsg(msg)
-                return false;
-            }
-        });
-    });
-    $(function() {
-        $("#slider3").responsiveSlides({
-            auto: true,
-            pager: false,
-            nav: true,
-            speed: 500,
-            namespace: "callbacks",
-            before: function() {
-                $('.events').append("<li>before event fired.</li>");
-            },
-            after: function() {
-                $('.events').append("<li>after event fired.</li>");
-            }
-        });
-
-    });
-</script>
 </html>
