@@ -40,6 +40,12 @@ public class LogController {
         return "home";
     }
 
+    @RequestMapping("/logout")
+    public String logout(HttpSession session){
+        session.removeAttribute("user");
+        return "welcome";
+    }
+
     @RequestMapping(value = "checkAccount",method = RequestMethod.POST)
     @ResponseBody
     public boolean checkAccount(String logup_account){

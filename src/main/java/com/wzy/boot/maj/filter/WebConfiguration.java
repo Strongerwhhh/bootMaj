@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Configuration
@@ -39,6 +40,7 @@ public class WebConfiguration {
                 throws IOException, ServletException {
             // TODO Auto-generated method stub
             HttpServletRequest request = (HttpServletRequest) srequest;
+            HttpSession session = request.getSession();
             System.out.println("this is MyFilter,url :"+request.getRequestURI());
             filterChain.doFilter(srequest, sresponse);
         }

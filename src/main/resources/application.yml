@@ -9,12 +9,11 @@ spring:
   resources:
     static-locations: classpath:/static
   jpa:
+    database: mysql
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-        hbm2ddl:
-          auto: update
 
   datasource:
     url: jdbc:mysql://localhost:3306/majhong?useSSL=true
